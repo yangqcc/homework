@@ -1,8 +1,9 @@
 package com.yqc.entity;
 
-import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+
+import java.util.Date;
 
 /**
  * <p>title:</p>
@@ -16,12 +17,9 @@ import lombok.Data;
 @AllArgsConstructor
 public class PersistenceData {
 
-  public PersistenceData() {
-  }
-
-  private String itemId;
-  private Date tradingDate;
-  private String stockCode;
-  private double itemValue;
+    private String itemId;
+    private Date tradingDate;
+    private String stockCode;
+    private double itemValue;
 
 }

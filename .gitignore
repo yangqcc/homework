@@ -1,4 +1,5 @@
-.gitignore
 .idea/
 README.txt
 homework.iml
+logs/
+target/
