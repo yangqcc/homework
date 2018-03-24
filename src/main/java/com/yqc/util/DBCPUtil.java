@@ -1,8 +1,9 @@
 package com.yqc.util;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Properties;
 import javax.sql.DataSource;
@@ -13,29 +14,40 @@ import org.apache.commons.dbcp.BasicDataSourceFactory;
  * <p>description:</p>
  *
  * @author yangqc
- * @date Created in 2018-03-23
+ * @date Created in 2018-03-24
  * @modified By yangqc
  */
-public class KCYDBCPUtil {
+public class DBCPUtil {
 
   private static Properties properties = new Properties();
   private static DataSource dataSource;
 
-  //加载DBCP配置文件
+  private final static DBCPUtil INSTANCE = new DBCPUtil();
+
+  /**
+   *  加载DBCP配置文件
+   */
   static {
     try {
-      InputStream is = KCYDBCPUtil.class.getResourceAsStream("/dbcp.properties");
+      InputStream is = DBCPUtil.class.getResourceAsStream("/dbcp.properties");
       properties.load(is);
       dataSource = BasicDataSourceFactory.createDataSource(properties);
-    } catch (IOException e) {
-      e.printStackTrace();
     } catch (Exception e) {
-      e.printStackTrace();
+      throw new RuntimeException(e.getCause());
     }
   }
 
-  //从连接池中获取一个连接
-  public static Connection getConnection() {
+  private DBCPUtil() {
+  }
+
+  public static DBCPUtil getInstance() {
+    return INSTANCE;
+  }
+
+  /**
+   * 从连接池中获取一个连接
+   */
+  public Connection getConnection() {
     Connection connection = null;
     try {
       connection = dataSource.getConnection();
@@ -50,4 +62,33 @@ public class KCYDBCPUtil {
     return connection;
   }
 
+  /**
+   * 关闭{@link ResultSet},{@link PreparedStatement},{@link Connection}
+   * @param rs
+   * @param ps
+   * @param connection
+   */
+  public void close(ResultSet rs, PreparedStatement ps, Connection connection) {
+    if (rs != null) {
+      try {
+        rs.close();
+      } catch (SQLException e) {
+        throw new RuntimeException(e);
+      }
+    }
+    if (ps != null) {
+      try {
+        ps.close();
+      } catch (SQLException e) {
+        throw new RuntimeException(e);
+      }
+    }
+    if (connection != null) {
+      try {
+        connection.close();
+      } catch (SQLException e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
 }
