@@ -41,13 +41,14 @@ public class ReadTask implements Runnable {
     private void read(String filePath) {
         File file = null;
         FileChannel fileChannel = null;
+        ByteBuffer byteBuffer = null;
         try {
             if (filePath == null || "".equals(filePath)) {
                 throw new IllegalArgumentException("文件路径不能为空!");
             }
             file = new File(CustomConfig.FILE_PATH);
             fileChannel = new RandomAccessFile(file, "r").getChannel();
-            ByteBuffer byteBuffer = ByteBuffer.allocate(5 * 1024 * 1024);
+            byteBuffer = ByteBuffer.allocate(5 * 1024 * 1024);
             //使用temp字节数组用于存储不完整的行的内容
             byte[] last = new byte[0];
             while (fileChannel.read(byteBuffer) != -1 && !isComplete.get()) {
@@ -63,6 +64,7 @@ public class ReadTask implements Runnable {
             throw new RuntimeException(e);
         } finally {
             try {
+                byteBuffer.clear();
                 fileChannel.close();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -101,9 +103,7 @@ public class ReadTask implements Runnable {
                 commit = false;
             }
         }
-        if (i != lastEndNum)
-
-        {
+        if (i != lastEndNum) {
             returnByte = new byte[i - lastEndNum];
             System.arraycopy(byteArray, lastEndNum, returnByte, 0, returnByte.length);
         }
